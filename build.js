@@ -1,116 +1,106 @@
+// build.js
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
 const obfuscator = require("javascript-obfuscator");
 
-// === Cấu hình ===
-const projectRoot = __dirname;
-const backupDir = path.join(projectRoot, ".backup_src");
-const exclude = ["node_modules", "dist", "build", ".git", ".backup_src", "package-lock.json", "yarn.lock"];
+const root = __dirname;
+const backupDir = path.join(root, `../backup_src_${new Date().toISOString().split("T")[0]}`);
+const exclude = [
+  "node_modules",
+  "dist",
+  "build",
+  ".git",
+  "backup_src",
+  "Admin",              // 🧩 Thêm dòng này
+  "package-lock.json",
+  "yarn.lock"
+];
 
-// === Hàm phụ trợ ===
-function readJSON(file) {
-  return JSON.parse(fs.readFileSync(file, "utf8"));
-}
-
-function writeJSON(file, data) {
-  fs.writeFileSync(file, JSON.stringify(data, null, 2));
-}
-
-// === 1. Backup source ===
-function backupSource() {
-  if (fs.existsSync(backupDir)) fs.rmSync(backupDir, { recursive: true, force: true });
-  fs.mkdirSync(backupDir);
-
-  copyRecursiveSync(projectRoot, backupDir);
-  console.log("✅ Đã backup source gốc vào", backupDir);
-}
-
-function copyRecursiveSync(src, dest) {
+// ===== Tiện ích =====
+function copyRecursive(src, dest) {
   if (!fs.existsSync(src)) return;
-
-  const stats = fs.statSync(src);
-  if (stats.isDirectory()) {
+  const stat = fs.statSync(src);
+  if (stat.isDirectory()) {
     if (exclude.includes(path.basename(src))) return;
     fs.mkdirSync(dest, { recursive: true });
-    fs.readdirSync(src).forEach((file) => {
-      copyRecursiveSync(path.join(src, file), path.join(dest, file));
-    });
-  } else {
-    fs.copyFileSync(src, dest);
-  }
+    fs.readdirSync(src).forEach(f => copyRecursive(path.join(src, f), path.join(dest, f)));
+  } else fs.copyFileSync(src, dest);
 }
 
-// === 2. Obfuscate code JS ===
-function obfuscateCode() {
-  function processDir(dir) {
-    fs.readdirSync(dir).forEach((file) => {
-      const fullPath = path.join(dir, file);
-      const stat = fs.statSync(fullPath);
-
-      if (stat.isDirectory()) {
-        if (exclude.includes(file)) return;
-        processDir(fullPath);
-      } else if (file.endsWith(".js") && file !== "build.js") {
-        const code = fs.readFileSync(fullPath, "utf8");
-        const result = obfuscator.obfuscate(code, {
-          compact: true,
-          controlFlowFlattening: true,
-          deadCodeInjection: true,
-          stringArray: true,
-          stringArrayEncoding: ["rc4"],
-          stringArrayThreshold: 0.75
-        });
-        fs.writeFileSync(fullPath, result.getObfuscatedCode());
-        console.log("🔒 Đã obfuscate:", fullPath);
-      }
-    });
-  }
-
-  processDir(projectRoot);
-  console.log("✅ Đã obfuscate toàn bộ file JS");
+function backupSource() {
+  fs.rmSync(backupDir, { recursive: true, force: true });
+  fs.mkdirSync(backupDir, { recursive: true });
+  copyRecursive(root, backupDir);
+  console.log("✅ Đã backup source vào:", backupDir);
 }
 
-// === 3. Bump version trong package.json ===
+function obfuscate(dir = root) {
+  fs.readdirSync(dir).forEach(file => {
+    const full = path.join(dir, file);
+    const stat = fs.statSync(full);
+    if (stat.isDirectory()) {
+      if (!exclude.includes(file)) obfuscate(full);
+    } else if (file.endsWith(".js") && file !== "build.js") {
+      const code = fs.readFileSync(full, "utf8");
+      const result = obfuscator.obfuscate(code, {
+        compact: true,
+        controlFlowFlattening: true,
+        deadCodeInjection: true,
+        stringArray: true,
+        stringArrayEncoding: ["rc4"],
+        stringArrayThreshold: 0.75
+      });
+      fs.writeFileSync(full, result.getObfuscatedCode());
+      console.log("🔒 Obfuscate:", file);
+    }
+  });
+}
+
 function bumpVersion() {
-  const pkgFile = path.join(projectRoot, "package.json");
-  const pkg = readJSON(pkgFile);
-
+  const pkgFile = path.join(root, "package.json");
+  const pkg = JSON.parse(fs.readFileSync(pkgFile, "utf8"));
   let [major, minor, patch] = pkg.version.split(".").map(Number);
   patch++;
   pkg.version = [major, minor, patch].join(".");
-
-  writeJSON(pkgFile, pkg);
+  fs.writeFileSync(pkgFile, JSON.stringify(pkg, null, 2));
   console.log("📌 Tăng version:", pkg.version);
   return pkg.version;
 }
 
-// === 4. Build app bằng electron-builder ===
-function buildApp(args) {
+function buildAndPush() {
   try {
-    console.log("⚡ Bắt đầu build app...");
-    execSync(`npx electron-builder ${args.join(" ")}`, { stdio: "inherit" });
-    console.log("✅ Build hoàn tất!");
-  } catch (err) {
-    console.error("❌ Lỗi khi build:", err);
+    console.log("⚡ Đang build app...");
+    execSync("npx electron-builder --win --publish always", { stdio: "inherit" });
+
+    console.log("📦 Commit + Push lên GitHub...");
+    execSync("git add .");
+    execSync(`git commit -m "auto release build" || echo No changes`);
+    execSync("git push");
+
+    console.log("✅ Hoàn tất build + upload!");
+  } catch (e) {
+    console.error("❌ Lỗi:", e.message);
   }
 }
 
-// === 5. Restore source ===
-function restoreSource() {
+function restore() {
   if (!fs.existsSync(backupDir)) return;
-
-  copyRecursiveSync(backupDir, projectRoot);
-  fs.rmSync(backupDir, { recursive: true, force: true });
-  console.log("♻️ Đã khôi phục source gốc sau khi build");
+  copyRecursive(backupDir, root);
+  console.log("♻️ Đã khôi phục source gốc.");
 }
 
-// === Thực thi ===
 (function main() {
-  const args = process.argv.slice(2); // ví dụ: --win --publish=never
+  console.log("==============================================");
+  console.log("   ⚙️  Electron Auto Release Builder");
+  console.log("==============================================");
+
   backupSource();
-  obfuscateCode();
+  obfuscate();
   bumpVersion();
-  buildApp(args);
-  restoreSource();
+  buildAndPush();
+  restore();
+
+  console.log("✨ Hoàn tất release patch!");
+  console.log("==============================================");
 })();

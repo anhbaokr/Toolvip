@@ -1,7 +1,7 @@
 {
   "name": "secureauth-pro",
-  "version": "1.0.2",
-  "description": "Hệ thống xác thực bảo mật với công nghệ đa tầng và License Key",
+  "version": "1.0.3",
+  "description": "Hệ thống xác thực bảo mật đa tầng và License Key",
   "author": "SecureAuth Team",
   "license": "MIT",
   "main": "main.js",
@@ -10,7 +10,8 @@
     "dev": "electron . --dev",
     "build": "node build.js -- --publish=never",
     "build:win": "node build.js -- --win --publish=never",
-    "release": "node build.js -- --win --publish=always"
+    "release": "node build.js -- --win --publish=always",
+    "release:patch": "node build.js"
   },
   "dependencies": {
     "axios": "^1.11.0",
