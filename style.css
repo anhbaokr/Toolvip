@@ -110,23 +110,7 @@ body {
   transform: rotate(15deg);
 }
 
-.app-info {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  font-size: var(--font-size-sm);
-  color: var(--gray);
-  background: rgba(255, 255, 255, 0.05);
-  padding: var(--spacing-xs) var(--spacing-sm);
-  border-radius: var(--border-radius);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  transition: var(--transition);
-}
 
-.app-info:hover {
-  background: rgba(255, 255, 255, 0.08);
-  transform: translateY(-1px);
-}
 
 /* Main Content */
 .main-content {
