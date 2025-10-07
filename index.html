@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline'">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SecureAuth Pro - Hệ thống xác thực bảo mật</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<!-- Toast Notifications Container -->
+<div id="toastContainer" class="toast-container"></div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-content">
+        <div class="logo">
+          <i class="fas fa-shield-alt"></i>
+          <span>SecureAuth Pro</span>
+        </div>
+        <div class="app-info" id="appInfo">
+          <i class="fas fa-circle-notch fa-spin"></i>
+          <span>Đang tải thông tin hệ thống...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      <!-- Welcome Screen -->
+      <div id="welcomeScreen" class="screen active">
+        <div class="welcome-container">
+          <div class="welcome-icon">
+            <i class="fas fa-lock"></i>
+          </div>
+          <h1>Hệ Thống Xác Thực Bảo Mật</h1>
+          <p>Công nghệ bảo mật đa tầng tiên tiến cho ứng dụng của bạn</p>
+          <button id="getStartedBtn" class="btn btn-primary btn-large">
+            <i class="fas fa-rocket"></i>
+            Bắt Đầu Ngay
+          </button>
+          
+          <!-- ĐÃ XÓA PHẦN FEATURE-GRID -->
+        </div>
+      </div>
+
+      <!-- Login Form -->
+      <div id="loginForm" class="screen">
+        <div class="form-container">
+          <div class="form-header">
+            <h2><i class="fas fa-sign-in-alt"></i> Đăng Nhập Hệ Thống</h2>
+            <p>Vui lòng nhập thông tin đăng nhập của bạn</p>
+          </div>
+          
+          <form id="loginFormElement">
+            <div class="input-group">
+              <label for="loginUser">
+                <i class="fas fa-user"></i>
+                Tên Đăng Nhập
+              </label>
+              <input type="text" id="loginUser" placeholder="Nhập tên đăng nhập của bạn" required>
+            </div>
+            
+            <div class="input-group">
+              <label for="loginPass">
+                <i class="fas fa-lock"></i>
+                Mật Khẩu
+              </label>
+              <input type="password" id="loginPass" placeholder="Nhập mật khẩu của bạn" required>
+            </div>
+            
+            <button type="submit" id="loginBtn" class="btn btn-primary btn-full">
+              <i class="fas fa-sign-in-alt"></i>
+              Đăng Nhập
+            </button>
+          </form>
+          
+          <div class="form-footer">
+            <p>Chưa có tài khoản? 
+              <a href="#" id="showRegister" class="link">Đăng Ký Ngay</a>
+            </p>
+            <p style="margin-top: 0.5rem;">
+              <a href="#" id="showForgotPassword" class="link">Quên mật khẩu?</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Forgot Password Screen -->
+      <div id="forgotPasswordScreen" class="screen">
+        <div class="form-container">
+          <div class="form-header">
+            <h2><i class="fas fa-key"></i> Quên Mật Khẩu</h2>
+            <p>Nhập email để nhận hướng dẫn reset mật khẩu</p>
+          </div>
+          
+          <div class="forgot-password-info">
+            <i class="fas fa-envelope-circle-check"></i>
+            <p>Chúng tôi sẽ gửi mã xác thực đến email của bạn</p>
+          </div>
+          
+          <form id="forgotPasswordForm">
+            <div class="input-group">
+              <label for="forgotEmail">
+                <i class="fas fa-envelope"></i>
+                Email đăng ký
+              </label>
+              <input type="email" id="forgotEmail" placeholder="email@example.com" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-full">
+              <i class="fas fa-paper-plane"></i>
+              Gửi Yêu Cầu
+            </button>
+          </form>
+
+          <div class="form-footer">
+            <p>Nhớ mật khẩu? 
+              <a href="#" id="showLoginFromForgot" class="link">Đăng nhập ngay</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reset Password Screen -->
+      <div id="resetPasswordScreen" class="screen">
+        <div class="form-container">
+          <div class="form-header">
+            <h2><i class="fas fa-lock"></i> Đặt Lại Mật Khẩu</h2>
+            <p>Nhập mật khẩu mới cho tài khoản của bạn</p>
+          </div>
+          
+          <form id="resetPasswordForm">
+            <div class="input-group">
+              <label for="resetToken">
+                <i class="fas fa-key"></i>
+                Mã xác thực
+              </label>
+              <input type="text" id="resetToken" placeholder="Nhập mã từ email" required>
+            </div>
+
+            <div class="input-group">
+              <label for="newPassword">
+                <i class="fas fa-lock"></i>
+                Mật khẩu mới
+              </label>
+              <input type="password" id="newPassword" placeholder="Mật khẩu mới" required>
+              <small class="input-hint">Tối thiểu 8 ký tự</small>
+            </div>
+
+            <div class="input-group">
+              <label for="confirmPassword">
+                <i class="fas fa-lock"></i>
+                Xác nhận mật khẩu
+              </label>
+              <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+            </div>
+            
+            <button type="submit" class="btn btn-success btn-full">
+              <i class="fas fa-check-circle"></i>
+              Đặt Lại Mật Khẩu
+            </button>
+          </form>
+
+          <div class="form-footer">
+            <p>
+              <a href="#" id="showForgotFromReset" class="link">Gửi lại mã xác thực</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Register Form -->
+      <div id="registerForm" class="screen">
+        <div class="form-container">
+          <div class="form-header">
+            <h2><i class="fas fa-user-plus"></i> Đăng Ký Tài Khoản</h2>
+            <p>Tạo tài khoản mới để sử dụng hệ thống</p>
+          </div>
+          
+          <div class="security-notice">
+            <i class="fas fa-exclamation-circle"></i>
+            <div>
+              <strong>Thông Báo Quan Trọng</strong>
+              <p>Vui lòng sử dụng email thật để nhận License Key kích hoạt tài khoản. License Key sẽ được gửi qua email sau khi đăng ký thành công.</p>
+            </div>
+          </div>
+          
+          <form id="registerFormElement">
+            <div class="input-row">
+              <div class="input-group">
+                <label for="regUser">
+                  <i class="fas fa-user"></i>
+                  Tên Đăng Nhập *
+                </label>
+                <input type="text" id="regUser" placeholder="Nhập tên đăng nhập" required>
+                <small class="input-hint">Tối thiểu 6 ký tự, không chứa ký tự đặc biệt</small>
+              </div>
+              
+              <div class="input-group">
+                <label for="regPass">
+                  <i class="fas fa-lock"></i>
+                  Mật Khẩu *
+                </label>
+                <input type="password" id="regPass" placeholder="Nhập mật khẩu mạnh" required>
+                <small class="input-hint">Tối thiểu 8 ký tự, bao gồm chữ và số</small>
+              </div>
+            </div>
+            
+            <div class="input-group">
+              <label for="regEmail">
+                <i class="fas fa-envelope"></i>
+                Email *
+              </label>
+              <input type="email" id="regEmail" placeholder="your-email@example.com" required>
+              <small class="input-hint">Sử dụng email thật để nhận License Key</small>
+            </div>
+            
+            <div class="input-row">
+              <div class="input-group">
+                <label for="regPhone">
+                  <i class="fas fa-phone"></i>
+                  Số Điện Thoại
+                </label>
+                <input type="tel" id="regPhone" placeholder="+84 xxx xxx xxx">
+                <small class="input-hint">Để admin liên hệ khi cần</small>
+              </div>
+              
+              <div class="input-group">
+                <label for="regCountry">
+                  <i class="fas fa-globe"></i>
+                  Quốc Gia
+                </label>
+                <select id="regCountry">
+                  <option value="">Chọn quốc gia</option>
+                  <option value="VN" selected>Việt Nam</option>
+                  <option value="US">United States</option>
+                  <option value="UK">United Kingdom</option>
+                  <option value="CA">Canada</option>
+                  <option value="AU">Australia</option>
+                </select>
+              </div>
+            </div>
+            
+            <button type="submit" id="registerBtn" class="btn btn-primary btn-full">
+              <i class="fas fa-user-plus"></i>
+              Đăng Ký Tài Khoản
+            </button>
+          </form>
+          
+          <div class="form-footer">
+            <p>Đã có tài khoản? 
+              <a href="#" id="showLogin" class="link">Đăng Nhập Ngay</a>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- License Verification Form -->
+      <div id="licenseCard" class="screen">
+        <div class="form-container">
+          <div class="form-header">
+            <h2><i class="fas fa-id-card"></i> Kích Hoạt License</h2>
+            <p>Nhập License Key để kích hoạt tài khoản</p>
+          </div>
+
+          <div class="security-notice">
+            <i class="fas fa-info-circle"></i>
+            <div>
+              <strong>Hướng Dẫn Kích Hoạt</strong>
+              <p>License Key sẽ được gửi qua email sau khi đăng ký thành công. Nếu chưa nhận được, vui lòng liên hệ Admin qua Zalo.</p>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="licenseKey">
+              <i class="fas fa-key"></i>
+              License Key *
+            </label>
+            <input type="text" id="licenseKey" placeholder="Dán License Key vào đây..." required>
+            <small class="input-hint">Định dạng: eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9...</small>
+          </div>
+
+          <div class="button-group">
+            <button id="btnVerify" class="btn btn-success btn-full">
+              <i class="fas fa-check-circle"></i>
+              Kích Hoạt Ngay
+            </button>
+            
+            <button id="btnContactAdmin" class="btn btn-outline btn-full">
+              <i class="fas fa-headset"></i>
+              Liên Hệ Admin Zalo
+            </button>
+            
+            <button id="btnBackToLogin" class="btn btn-outline btn-full">
+              <i class="fas fa-arrow-left"></i>
+              Quay Lại Đăng Nhập
+            </button>
+          </div>
+
+          <div id="licenseStatus" class="status-message"></div>
+        </div>
+      </div>
+
+      <!-- Main App Dashboard -->
+      <div id="mainApp" class="screen">
+        <div class="dashboard">
+          <div class="dashboard-header">
+            <h1><i class="fas fa-tachometer-alt"></i> Bảng Điều Khiển</h1>
+            <p>Chào mừng bạn đến với hệ thống SecureAuth Pro</p>
+          </div>
+           <div class="user-welcome">
+              <i class="fas fa-user-circle"></i>
+              <span>Xin chào, <strong id="welcomeUserName">Người dùng</strong>!</span>
+            </div>
+                <div id="licenseInfo" class="license-info"></div>
+              </div>
+            
+            <button id="logoutBtn" class="btn btn-outline btn-large">
+              <i class="fas fa-sign-out-alt"></i>
+              Đăng Xuất
+            </button>
+      </div>
+
+    <!-- ĐÃ XÓA STATUS BAR -->
+  </div>
+
+  <!-- Contact Admin Modal -->
+  <div id="contactModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3><i class="fas fa-headset"></i> Liên Hệ Admin</h3>
+        <span class="modal-close">&times;</span>
+      </div>
+      <div class="modal-body">
+        <div class="contact-info">
+          <div class="contact-item">
+            <i class="fas fa-phone"></i>
+            <div>
+              <strong>Zalo Admin</strong>
+              <p>0365798789</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-envelope"></i>
+            <div>
+              <strong>Email Hỗ Trợ</strong>
+              <p>luannvkr@gmail.com</p>
+            </div>
+          </div>
+          <div class="contact-item">
+            <i class="fas fa-clock"></i>
+            <div>
+              <strong>Thời Gian Hỗ Trợ</strong>
+              <p>24/7 - 08:00 đến 22:00</p>
+            </div>
+          </div>
+        </div>
+        <div class="contact-message">
+          <p><strong>Lưu ý:</strong> Khi liên hệ, vui lòng cung cấp thông tin:</p>
+          <ul>
+            <li>Tên đăng nhập của bạn</li>
+            <li>Email đã đăng ký</li>
+            <li>Mô tả vấn đề gặp phải</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="contactZalo" class="btn btn-primary">
+          <i class="fas fa-comment"></i>
+          Nhắn Tin Zalo Ngay
+        </button>
+        <button id="contactClose" class="btn btn-outline">
+          Đóng
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="./renderer.js"></script>
+  <script src="./admincp-manager.js"></script>
+</body>
+</html>
